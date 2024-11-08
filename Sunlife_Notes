@@ -1,0 +1,1880 @@
+    1  sudo yum install -y yum-utils
+    2  sudo yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+    3   sudo yum install docker-ce docker-ce-cli containerd.io
+    4  systemctl status docker
+    5  systemctl start docker
+    6  systemctl status docker
+    7  history
+    8  docker --version
+    9  docker pull ubuntu
+   10  docker images
+   11  docker image ls
+   12  docker pull ubuntu:18.04
+   13  docker images
+   14  docker rmi ubuntu:18.04
+   15  docker pull centos
+   16  docker container run -it --name c1 -d ubuntu
+   17  docker ps
+   18  docker container ls
+   19  docker container run -it --name c1 -d centos
+   20  docker container run -it --name c2 -d centos
+   21  docker container ls
+   22  docker stop c1
+   23  docker container ls
+   24  docker ps -a
+   25  docker container ls --all
+   26  history
+   27  docker start c1
+   28  docker container ls
+   29  docker kill c1
+   30  docker ps -a
+   31  docker restart c1
+   32  docker container ls
+   33  docker stop c1
+   34  docker rm c1
+   35  docker ps -a
+   36  docker rm -f c2
+   37  docker container ls --all
+   38  docker container run -it --name c1 -d centos
+   39  docker container ls --all
+   40  docker rmi centos
+   41  docker stop c1
+   42  docker rmi centos
+   43  docker stop c1
+   44  docker rmi centos
+   45  docker rm c1
+   46  docker rmi centos
+   47  docker container -it run --name c1 -d ubuntu
+   48  docker container run -it --name c1 -d ubuntu
+   49  docker container ls
+   50  docker exec -it c1 bash
+   51  docker ps
+   52  docker commit c1 webimg
+   53  docker images
+   54  docker container run -itd --name c2 webimg
+   55  docker exec -it c2 bash
+   56  docker images
+   57  docker ps -a
+   58  docker rm -f c1 c2
+   59  docker container run -itd --name webserver -p 80:80 webimg
+   60  docker container ls
+   61  docker exec -it webserver bash
+   62  vi test.html
+   63  docker cp test.html webserver:/var/www/html
+   64  docker exec -it webserver bash
+   65  docker stats webserver
+   66  docker top webserver
+   67  history
+   68  sudo docker run -m 4m -dit --name web1 nginx
+   69  sudo docker run -m 8m -dit --name web1 nginx
+   70  docker stats web1
+   71  ls /var/lib/docker/
+   72  docker images
+   73  docker save webimg > myimg.tar
+   74  ls
+   75  docker rm -f $(docker ps -a -q)
+   76  docker rmi webimg
+   77  ls
+   78  docker images
+   79  docker load <myimg.tar
+   80  docker images
+   81  docker container run -itd --name c1 webimg
+   82  docker container ls
+   83  docker export c1 mywebimg
+   84  docker export c1 -o  mywebimg
+   85  docker export c1 -o  mywebimg.tar
+   86  ls
+   87  docker rm -f c1
+   88  docker rmi webimg nginx ubuntu
+   89  docker images
+   90  ls
+   91  docker import mywebimg.tar myimg
+   92  docker images
+   93  docker load < mywebimg.tar
+   94  vi Dockerfile
+   95  docker build -t my-java-app .
+   96  docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=pass -d mysql:8.0
+   97  docker ps
+   98  docker exec -it some-mysql bash
+   99  docker login
+  100  docker logout
+  101  docker login
+  102  docker images
+  103  docker rmi 9dac656d25e5
+  104  docker ps
+  105  docker ps -a
+  106  docker rm d8984ae6f588
+  107  docker rmi 9dac656d25e5
+  108  docker images
+  109  docker push myimg
+  110  docker ps
+  111  docker commit some-mysql ramansharma95/mydb
+  112  docker images
+  113  docker push ramansharma95/mydb
+  114  docker list
+  115  docker --help
+  116  docker images
+  
+  -----------Registry-------------
+  1. Create a container with registry docker image
+
+ docker container run -d -p 5000:5000 --name local_registry registry
+
+2. Access the container on 5000 port with your serverip ( system's IP) 
+
+ http://<serverip>:5000/v2/_catalog
+
+3. Inspect the container
+
+ docker container inspect local_registry
+
+4. Clone the ubuntu image to localhost:5000/ubuntu:latest
+
+ docker image tag ubuntu localhost:5000/ubuntu:latest
+
+5. Push the image to docker registry
+
+ docker image push localhost:5000/ubuntu
+
+
+6. Pull the image with following command ( you can remove the image first and then you can run below command to restore the image)
+
+ docker image pull localhost:5000/ubuntu
+ 
+ ------------------------Storage------------------
+ 
+docker volume create demo-vol
+docker volume ls     //to list the volumes
+docker run -it --mount source=demo-vol,destination=/app -d ubuntu
+docker run -it --mount source=demo-vol,destination=/test --mount source=demo-vol1,destination=/test1 -d ubuntu
+
+---------------commands---------
+ docker volume --help
+  295  docker volume ls
+  296  docker volume prune
+  297  docker volume ls
+  298  docker volume create demo-vol
+  299  docker volume ls
+  300  ls /var/lib//docker/
+  301  ls /var/lib//docker/volumes/
+  302  docker volume rm demo-vol
+  303  ls /var/lib//docker/volumes/
+  304  docker volume create demo-vol
+  305  docker volume ls
+  306  ls /var/lib//docker/volumes/
+  307  ls /var/lib//docker/volumes/demo-vol/
+  308  ls /var/lib//docker/volumes/demo-vol/_data/
+  309  docker rm -f c1
+  310  docker container run -it --name c1 --mount source=demo-vol,destination=/app -d ubuntu
+  311  docker exec -it c1 bash
+  312  ls /var/lib//docker/volumes/demo-vol/_data/
+  313  docker rm -f c1
+  314  ls /var/lib//docker/volumes/demo-vol/_data/
+  315  docker container run -itd --name c2 --mount source=demo-vol,destination=/demo ubuntu
+  316  docker exec -it c2
+  317  docker exec -it c2 bash
+  318  docker container run -itd --name c3 --mount source=demo-vol,destination=/demo1 ubuntu
+  319  docker exec -it c3 bash
+  320  ls /var/lib//docker/volumes/demo-vol/_data/
+  321  touch /var/lib//docker/volumes/demo-vol/_data/5
+  322  ls /var/lib//docker/volumes/demo-vol/_data/
+  323  docker exec -it c3 bash
+  324  docker volume rm demo-vol
+  325  ls
+  326  rm -ifr /var/lib/docker/volumes/demo-vol/_data/
+  327  ls /var/lib//docker/volumes/demo-vol/_data/
+  328  docker exec -it c2 bash
+  329  ls /var/lib//docker/volumes/demo-vol/_data/
+  330  mkdir /var/lib//docker/volumes/demo-vol/_data
+  331  ls /var/lib//docker/volumes/demo-vol/_data/
+  332  touch /var/lib//docker/volumes/demo-vol/_data/1
+  333  docker exec -it c2 bash
+  334  docker rm -f c2 c3
+  335  docker volume prune
+  336  docker volume ls
+
+---------------------------------
+
+----------Docker Bind Mount Example
+
+docker run -it -v /home/ubuntu/mount:/demo -d ubuntu
+
+---commands----
+mkdir mydir
+  343  docker container run -it -d --name c4 -v /home/centos/mydir:/app ubuntu
+  344  docker exec -it c4 bash
+  345  ls mydir/
+  346  docker container inspect c4
+  347  cd mydir/`
+
+  348  cd mydir/
+  349  touch 5 6
+  350  ls
+  351  docker exec -it c4 bash
+
+---------------
+------------------------Docker file--------------------
+
+ Docker can build images automatically by reading the instructions from a Dockerfile. A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image. Using docker build users can create an automated build that executes several command-line instructions in succession.
+
+Some of the Keyword's definition
+
+FROM
+
+is define th base image on which we are building  eg FROM ubuntu
+
+ADD
+
+is used to add the files to the container being built, ADD <source> <destination in the container>
+
+RUN
+
+is used to add layers to the base image, by installing components.Each RUN statement add a new layer to the docker image
+
+CMD
+
+is used to run the command on start of the container.These commands run when there is no argument specified while running the container.
+
+ENTRYPOINT
+
+is used to strictly run the commands the moment the container intializes. The difference between CMD and ENTRYPOINT is, ENTRYPOINT runs  irrespective of the fact that whether the argument is specified or not.
+
+ENV
+
+is used to define the environment in container.
+
+docker build
+Description
+Build an image from a Dockerfile
+
+sudo docker build -t nonrootimage . # create custom image (nonrootimage)
+
+
+
+Examples.
+
+Create an image which has base image ubuntu and apache2 is to be installed on it and create an index.html file in current directory,  all the files from the current directory is to be copied to /var/www/html folder. Once the container is started it should run the apache service and also create one environment variable called "name" and it should have value "DEVOPS
+
+
+
+FROM ubuntu
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+
+RUN apt-get -y install apache2
+
+ADD . /var/www/html
+
+ENTRYPOINT apachectl -D FOREGROUND
+
+ENV name DEVOPS 
+
+
+
+Run below command to build the image
+
+docker build . -t  img1   #Created the image from above Dockerfile
+
+Example 2
+
+Create a Docker file which uses a base image of CentOS 7 and create a user john and change to non-root privilege
+
+
+
+# Base image is CentOS 7
+
+FROM centos:7
+
+# Add a new user "john" with user id 8877
+
+RUN useradd -u 8877 john
+
+# Change to non-root privilege
+
+USER john
+
+
+
+Example 3
+
+#Eample of COPY and ADD
+
+
+
+FROM centos:7.4.1708
+
+RUN mkdir /mydata
+
+COPY myfiles /mydata/myfiles  
+
+ADD myfile2 /mydata/myfile2  
+
+ADD https://mirrors.estointernet.in/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz /mydata 
+
+ADD apache-maven-3.6.3-src.tar.gz /mydata/maven
+
+------------------------------------------------------------------
+
+
+
+# CMD and ENTRYPOINT
+
+FROM ubuntu
+
+CMD echo "Hello World"
+
+
+
+docker build . -t  img1   #Created the image from above Dockerfile
+
+docker run -it img1 # it will return Hello World
+
+docker run -it img1 echo "Hello India" # it will overwrite the CMD and Print Hello India
+
+
+
+FROM ubuntu
+
+ENTRYPOINT ["echo","Hello World"]
+
+docker build . -t  img1   #Created the image from above Dockerfile
+
+docker run -it img1 # it will return Hello World
+
+docker run -it img1 echo "Hello India" # it will not overwrite the ENTRYPOINT and Print Hello World echo Hello India
+
+
+
+FROM ubuntu
+
+ENTRYPOINT ["echo"]
+
+CMD ["Hello World"]
+
+docker build . -t  img1   #Created the image from above Dockerfile
+
+docker run -it img1 # it will return Hello World
+
+Note:- if the file name is not Dockerfile
+
+docker build . -f abc -t img8 # abc is the file name which represents the dockerfile contents
+-------------------------------------------------------
+
+-------------------Docker compose------------
+
+---Installation
+ 389  sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)"  -o /usr/local/bin/docker-compose
+  390  sudo mv /usr/local/bin/docker-compose /usr/bin/docker-compose
+  391  sudo chmod +x /usr/bin/docker-compose
+  392  docker-compose
+  393  docker-compose --version
+  
+  ---example-1
+  version: '3.3'
+
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - db_data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: somewordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:latest
+     ports:
+       - "8000:80"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: wordpress
+       WORDPRESS_DB_NAME: wordpress
+volumes:
+    db_data: {}
+    
+    ---Example-2
+    
+    version: '3.3'
+
+services:
+   db:
+     image: ramansharma95/mysql
+   webapp:
+     image: ramansharma95/webapp
+     ports:
+       - "84:80"
+
+
+----command to run the docker compose file
+docker-compose up -d
+docker-compose down
+
+
+------------------------Assignment-------------------------------------------
+1.	Create a container called webserver with ubuntu docker image. Ans :-docker contaienr run -itd --name webserver ubuntu
+2.	Install apache server in the container(webserver) Ans:- docker exec -it webserver bash , then apt update , apt install apache2 -y
+3.	Start apache service in the container   Ans:- service apache2 start
+4.	Access apache default page on the web browser, Ans docker commit webserver webimg, docker container run -itd --name c1 -p 80:80 webimg
+5.	Create a new webpage myapp.html on the host machine and copy it to /var/www/html folder in webserver container. Ans docker cp myapp.html /var/www/html/
+6.	Access myapp.html page on the browser Ans: publicip:80
+7.	Check how much memory and cpu is consumed by web server containers. docker stats c1
+8.	Stop the container and verify that you are not able to access apache website on browser. docker stop c1
+9.	Start container and now you should be able to access the apache website. docker start c1
+10.	Remove  webserver container docker rm -f c1
+
+----------------------------------------Kubernetes------------------
+---------Instalation
+--------------on Centos on all master and client machine
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg \
+   https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+exclude=kubelet kubeadm kubectl
+EOF
+ 
+# Set SELinux in permissive mode (effectively disabling it)
+sudo setenforce 0
+sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+ 
+sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+ 
+sudo systemctl enable --now kubelet
+
+---------------Create Master Server
+On master machine run the below command
+
+ 
+
+1.  kubeadm init --apiserver-advertise-address=<<Master ServerIP>> --pod-network-cidr=192.168.0.0/16
+
+ 
+
+2.  mkdir -p $HOME/.kube
+
+3.  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+
+4.  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Calico yaml file is to be applied
+
+5.  Run the join command on each of the worker node which you want to join in the cluser.
+
+ kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
+
+7.  Run kubectl get nodes command on master node
+
+-------------------------------------------------------------------
+Pod Overview -Lab
+LAB
+
+1.# nginx-pod.yaml
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+
+  name: nginx-pod
+
+  labels:
+
+    app: nginx
+
+    tier: dev
+
+spec:
+
+  containers:
+
+  - name: nginx-container
+
+    image: nginx
+
+ 
+
+ 
+
+ 
+
+2. Create and display Pods
+# Create and display PODs
+
+kubectl create -f nginx-pod.yaml
+
+kubectl get pod
+
+kubectl get pod -o wide
+
+kubectl get pod nginx-pod -o yaml
+
+kubectl describe pod nginx-pod
+
+3. Test & Delete
+# To get inside the pod
+
+kubectl exec -it nginx-pod -- /bin/sh
+
+ 
+
+# Create test HTML page
+cat <<EOF > /usr/share/nginx/html/test.html
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title>Testing..</title>
+
+</head>
+
+<body>
+
+<h1 style="color:rgb(90,70,250);">Hello, DevopsWorld...!</h1>
+
+<h2>Congratulations, you passed :-) </h2>
+
+</body>
+
+</html>
+
+EOF
+
+exit
+
+ 
+
+# Expose PODS using NodePort service
+kubectl expose pod nginx-pod --type=NodePort --port=80
+
+ 
+
+# Display Service and find NodePort
+kubectl describe svc nginx-pod
+
+kubectl get svc
+
+# Open Web-browser and access webapge using
+http://nodeip:nodeport/test.html
+
+# Delete pod & svc
+kubectl delete svc nginx-pod
+
+kubectl delete pod nginx-pod
+
+
+-----------------------------LAB2------------------------------
+
+nodeName is the field in PodSpec.It specifies that a pod is to run on a particular node
+
+Example: If you want to run a pod on worker node kwn1, then the pod creation script will be a mentioned below
+
+Step1:- Create a file called nodeName.yaml
+
+#nodeName.yaml
+
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+
+  name: podonkwn1
+
+spec:
+
+   containers:
+
+   - name: nginx-container
+
+     image: nginx
+
+   nodeName: kwn1
+
+ 
+
+Step2: Create the pod by running below command
+
+ 
+
+kubectl create -f nodeName.yaml
+
+ 
+
+Step3: Verify the pods are getting created on kwn1 or not by running below command
+
+ 
+
+kubectl get pods -o wide
+
+ 
+
+nodeSelector
+nodeSelector is the simplest recommended form of node selection constraint. nodeSelector is a field of PodSpec. It specifies a map of key-value pairs. For the pod to be eligible to run on a node, the node must have each of the indicated key-value pairs as labels (it can have additional labels as well). The most common usage is one key-value pair.
+
+ 
+
+Example: Create a Pod on the worker node which is of production environment, means the worker nodes which has label env=prod
+
+ 
+
+Step1: Check the labels on all the nodes
+
+ 
+
+kubectl get nodes --show-labels
+
+ 
+
+Step2: Check the label on a specific node ( say kwn2)
+
+ 
+
+kubectl get nodes --show-labels kwn2
+
+ 
+
+Step3: Create a label env=prod for a worker node ( say kwn2)
+
+ 
+
+kubectl label nodes kwn2 env=prod
+
+ 
+
+Step4: Create a pod with nodeSelector specification. Create file with name nodeselector.yaml
+
+ 
+
+#nodeselector.yaml
+
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+
+ name: podnodeselector
+
+spec:
+
+  containers:
+
+   - name: container1
+
+     image: nginx
+
+  nodeSelector:
+
+     env: prod
+
+ 
+
+Step5: Create the pod by running below command
+
+ 
+
+kubectl create -f nodeselector.yaml
+
+ 
+
+Step6: Verify the pod “podselector” is created on kwn2 by running below command
+
+ 
+
+kubectl get pods -o wide
+
+----------------------Secrets---------------------------
+Secrets same as ConfigMap sensitive data( password Authtoken ssh keys)
+
+1. Secrets to store the confidential data
+
+2. Secrets use by default base64 algorithm to encode the data
+
+3. Secrets are mapped to pod where these are decoded on Pod level
+
+4. It stores the data in Key-Value pair 
+
+5. from file and from literal
+
+6. Data should not be more than 1 MB
+
+7. you can store the data from text files 
+
+8. Secret data is stored in etcd database
+
+
+
+LAB
+
+
+# 1. Creating Secret using Kubectl & Consuming it from "volumes" inside Pod
+
+
+
+
+
+1a. Creating secret using "Kubectl":
+
+------------------------------------
+
+echo -n 'admin' > username.txt
+
+echo -n 'pa$$w00rd' > password.txt
+
+
+
+kubectl create secret generic nginx-secret-vol --from-file=username.txt --from-file=password.txt
+
+
+
+# rm -f username.txt password.txt
+
+
+
+kubectl get secrets
+
+kubectl describe secrets nginx-secret-vol
+
+
+
+1b. Consuming "nginx-secret-vol" from "volumes" inside Pod
+
+--------------------------------------------------------
+
+
+
+#nginx-pod-secret-vol.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-secret-vol
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+    volumeMounts:
+    - name: test-vol
+      mountPath: "/etc/confidential"
+      readOnly: true
+  volumes:
+  - name: test-vol
+    secret:
+      secretName: nginx-secret-vol
+
+
+==========================================================
+
+
+
+1c. Create | Display | Validate:
+
+--------------------------------
+
+
+
+# Create
+
+kubectl create -f nginx-pod-secret-vol.yaml
+
+
+
+# Display
+
+kubectl get po
+
+kubectl get secrets
+
+kubectl describe pod nginx-pod-secret-vol
+
+
+
+# Validate from "inside" the pod
+
+kubectl exec nginx-pod-secret-vol -it /bin/sh
+
+cd /etc/confidential
+
+ls 
+
+cat username.txt
+
+cat password.txt
+
+exit
+
+
+
+(OR)
+
+
+
+# Validate from "outside" the pod
+
+kubectl exec nginx-pod-secret-vol ls /etc/confidential
+
+kubectl exec nginx-pod-secret-vol cat /etc/confidential/username.txt
+
+2. Creating Secret "manually" using YAML file & Consuming it from "environment variables" inside Pod
+
+
+
+
+
+2a.  Creating Secret using YAML file:
+
+-------------------------------------
+
+
+
+# Encoding secret
+
+echo -n 'admin' | base64
+
+echo -n 'pa$$w00rd' | base64
+
+
+
+# YAML file
+
+# redis-secret-env.yaml
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-secret-env
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: cGEkJHcwMHJk
+
+
+kubectl create -f redis-secret-env.yaml
+
+kubectl get secret
+
+kubectl describe secret redis-secret-env
+
+
+
+===============================================================================
+
+
+
+2b. Consuming “redis-secret-env” secret from “Environment Variables” inside pod
+# redis-pod-secret-env.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-pod-secret-env
+spec:
+  containers:
+  - name: redis-container
+    image: redis
+    env:
+      - name: SECRET_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: redis-secret-env
+            key: username
+      - name: SECRET_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: redis-secret-env
+            key: password
+  restartPolicy: Never
+
+
+===============================================================================
+
+
+
+2c. Create | Display | Validate:
+
+
+
+# Create
+
+kubectl create -f  redis-pod-secret-env.yaml
+
+
+
+# Display
+
+kubectl get pods
+
+kubectl get secrets
+
+kubectl describe pod redis-pod-secret-env
+
+
+
+
+
+# Validate from "inside" the pod
+
+kubectl exec redis-pod-secret-env -it /bin/sh
+
+env | grep  SECRET
+
+exit
+
+
+
+(OR)
+
+
+
+# Validate from "outside" the pod
+
+kubectl exec redis-pod-secret-env env | grep SECRET
+
+
+
+***************************************************************************
+
+#Decode the secrets
+
+
+
+kubectl get secret redis-secret-env -o yaml
+
+echo 'cGEkJHcwMHJk' | base64 --decode
+
+*************************************************************************************************************************************************
+
+
+
+3. Cleanup
+
+
+
+# Delete secrets
+
+kubectl delete secrets nginx-secret-vol redis-secret-env
+
+
+
+# Delete pods
+
+kubectl delete pods nginx-pod-secret-vol redis-pod-secret-env
+
+
+
+# Validate
+
+kubectl get pods
+
+kubectl get secrets
+
+------------------------------------RBAC------------
+
+By Raman
+ Role-based access control (RBAC) is a method of regulating access to computer or network resources based on the roles of individual users within your organization.
+
+LAB
+
+kubectl create ns finance
+
+openssl genrsa -out john.key 2048  # it will create a private key
+
+openssl req -new -key john.key -out john.csr -subj "/CN=john/O=javadeveloper"
+
+
+
+openssl x509 -req -in john.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out john.crt -days 500
+
+
+
+#Create a role for namespace finance with resource permission 
+#role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: finance
+  name: deployment-manager
+rules:
+- apiGroups: ["","extensions","apps"]
+  #
+  # at the HTTP level, the name of the resource for accessing ConfigMap
+  # objects is "configmaps"
+  resources: ["deployments","replicasets","pods"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+
+kubectl create -f role.yaml
+
+
+
+
+
+#rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+# This role binding allows "jane" to read pods in the "default" namespace.
+# You need to already have a Role named "pod-reader" in that namespace.
+kind: RoleBinding
+metadata:
+  name: deployment-manager-binding
+  namespace: finance
+subjects:
+# You can specify more than one "subject"
+- kind: User
+  name: john
+  apiGroup: ""
+roleRef:
+  # "roleRef" specifies the binding to a Role / ClusterRole
+  kind: Role #this must be Role or ClusterRole
+  name: deployment-manager # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: ""
+
+
+kubectl create -f rolebinding.yaml
+
+
+
+kubectl config set-credentials john --client-certificate=/home/ubuntu/temp/john.crt --client-key=/home/ubuntu/temp/john.key
+
+
+
+kubectl config set-context developer-context --cluster=kubernetes --namespace=finance --user=john
+
+
+
+----Install client
+
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+
+
+
+ chmod +x ./kubectl
+
+
+
+ sudo mv ./kubectl /usr/local/bin/kubectl
+
+ kubectl version --client
+
+
+
+
+
+ ls ./kube
+
+ kubectl --kubeconfig config cluster-info
+
+ kubectl --kubeconfig config config view
+
+ kubectl --kubeconfig config config view -o jsonpath='{.contexts[*].name}'
+
+ 
+
+ kubectl --kubeconfig config get pods -n finance
+
+ kubectl --kubeconfig config run nginx-pod --image=nginx -n finance
+
+
+ kubectl --kubeconfig config get pods -n finance
+
+-----------------------Resource Quota------------------
+By Raman
+A resource quota, defined by a ResourceQuota object, provides constraints that limit aggregate resource consumption per namespace. It can limit the quantity of objects that can be created in a namespace by type, as well as the total amount of compute resources that may be consumed by resources in that project.
+
+LAB
+
+apiVersion: v1
+
+kind: ResourceQuota
+
+metadata:
+
+  name: quota-demo1
+
+  namespace: quota-demo-ns
+
+spec:
+
+  hard:
+
+    pods: "2"
+
+
+    configmaps: "1"
+
+
+
+#2
+
+apiVersion: v1
+
+kind: ResourceQuota
+
+metadata:
+
+  name: quota-demo-mem
+
+  namespace: quota-demo-ns
+
+spec:
+
+  hard:
+
+
+    limits.memory: "500Mi"
+
+
+
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+
+  name: mem-limit
+
+  namespace: quota-demo-ns
+
+spec:
+
+  containers:
+
+  - name: memlimit 
+
+    image: nginx
+
+    resources:
+
+      limits:
+
+
+        memory: "200Mi"
+-------------------------------------------------------
+
+
+----------------Replication Contorller-----------------------------
+By Raman
+A ReplicationController ensures that a specified number of pod replicas are running at any one time. In other words, a ReplicationController makes sure that a pod or a homogeneous set of pods is always up and available.
+
+How a ReplicationController Works
+
+If there are too many pods, the ReplicationController terminates the extra pods. If there are too few, the ReplicationController starts more pods. Unlike manually created pods, the pods maintained by a ReplicationController are automatically replaced if they fail, are deleted, or are terminated. For example, your pods are re-created on a node after disruptive maintenance such as a kernel upgrade. For this reason, you should use a ReplicationController even if your application requires only a single pod.
+
+
+
+LAB
+
+
+
+1. Replication Controller YAML file
+
+
+
+# nginx-rc.yaml  
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: nginx-rc
+spec:
+  replicas: 3
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        app: nginx-app
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx
+        ports:
+        - containerPort: 80
+  selector:
+    app: nginx-app
+
+
+
+
+*******************************************************************
+
+# 2. Create and display
+
+
+
+kubectl create -f nginx-rc.yaml
+
+kubectl get po -o wide
+
+kubectl get po -l app=nginx-app
+
+kubectl get rc nginx-rc
+
+kubectl describe rc nginx-rc
+
+
+
+*******************************************************************
+
+# 3. Reschedule
+
+
+
+kubectl get po -o wide --watch
+
+kubectl get po -o wide
+
+kubectl get nodes
+
+
+
+*******************************************************************
+
+# 4. Scaling up cluster
+
+
+
+kubectl scale rc nginx-rc --replicas=5
+
+kubectl get rc nginx-rc
+
+kubectl get po -o wide
+
+
+
+*******************************************************************
+
+# 5. Scalling down
+
+
+
+kubectl scale rc nginx-rc --replicas=3
+
+kubectl get rc nginx-rc
+
+kubectl get po -o wide
+
+
+
+*******************************************************************
+
+# 6. Cleanup
+
+
+
+kubectl delete -f nginx-rc.yaml
+
+kubectl get rc
+
+kubectl get po -l app=nginx-app
+-------------------------------------------------------------------
+
+-------------------------Replicaset----------------------------
+A ReplicaSet's purpose is to maintain a stable set of replica Pods running at any given time. As such, it is often used to guarantee the availability of a specified number of identical Pods.
+
+Replication Controller(Equality based)
+
+ReplicaSet (Set Based
+
+It uses the operators ( =, ==, !=)
+
+Operators ( in, notin,exists)
+
+Example env=prod, env!=stag
+
+Env in(prod)
+
+Command Line
+
+kubectl get pods -l env=prod
+
+Kubectl get pods ‘env in(prod,qa)’
+
+Manifest
+
+selector:
+
+    app: nginx-app
+
+ 
+
+  selector:
+
+    matchLabels:
+
+      app: nginx-app
+
+    matchExpressions:
+
+      - {key: tier, operator: In, values: [frontend]}
+
+
+LAB
+
+
+
+# nginx-rs.yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs
+spec:
+  replicas: 3
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        app: nginx-app
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx
+        ports:
+        - containerPort: 80
+  selector:
+    matchLabels:
+      app: nginx-app
+    matchExpressions:
+      - {key: tier, operator: In, values: [frontend]}
+
+
+
+
+*******************************************************************
+
+# 2. Create and display replicaset
+
+
+
+kubectl create -f nginx-rs.yaml
+
+kubectl get po -o wide
+
+kubectl get po -l app=nginx-app
+
+kubectl get rs nginx-rs -o wide
+
+kubectl describe rs nginx-rs
+
+kubectl get po -l 'tier in (frontend)'
+
+*******************************************************************
+
+# 3. Automatic Pod Reschedule 
+
+
+
+kubectl get po -o wide --watch
+
+kubectl get po -o wide
+
+kubectl get nodes
+
+
+
+*******************************************************************
+
+# 4. Scale up pods
+
+
+
+kubectl scale rs nginx-rs --replicas=5
+
+kubectl get rs nginx-rs -o wide
+
+kubectl get po -o wide
+
+
+
+*******************************************************************
+
+# 5. Scale down pods
+
+
+
+kubectl scale rs nginx-rs --replicas=3
+
+kubectl get rs nginx-rs -o wide
+
+kubectl get po -o wide
+
+
+
+*******************************************************************
+
+# 6. Cleanup
+
+
+
+kubectl delete -f nginx-rs.yaml
+
+kubectl get rs
+
+kubectl get po -l app=nginx-app
+----------------------------------------------------------------
+
+----------------------services--------------------
+An abstract way to expose an application running on a set of Pods as a network service.
+
+With Kubernetes you don't need to modify your application to use an unfamiliar service discovery mechanism. Kubernetes gives Pods their own IP addresses and a single DNS name for a set of Pods, and can load-balance across them
+
+CLUSTER IP
+
+ClusterIP is the default kubernetes service. This service is created inside a cluster and can only be accessed by other pods in that cluster. So basically we use this type of service when we want to expose a service to other pods within the same cluster.
+
+Nodeport:
+NodePort opens a specific port on your node/VM and when that port gets traffic, that traffic is forwarded directly to the service.
+
+There are a few limitations and hence its not advised to use NodePort
+
+- only one service per port
+
+- You can only use ports 30000-32767
+
+
+
+LoadBalancer:
+This is the standard way to expose service to the internet. All the traffic on the port is forwarded to the service. It's designed to assign an external IP to act as a load balancer for the service.  There's no filtering, no routing. LoadBalancer uses cloud service
+
+Few limitations with LoadBalancer:
+
+- every service exposed will it's own ip address 
+
+- It gets very expensive 
+
+
+
+1. Deployment & NodePort service manifest file
+
+
+
+Deployment YAML file:
+
+~~~~~~~~~~~~~~~~~~~~~
+
+# Deployment
+# nginx-deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-app
+  template:
+    metadata:
+      labels:
+        app: nginx-app
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+
+
+--------------------------------------
+
+
+
+NodePort Service YAML file:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Service
+# nginx-svc-np.yaml
+apiVersion: v1
+kind: Service	
+metadata:
+  name: my-service
+  labels:
+    app: nginx-app
+spec:
+  selector:
+    app: nginx-app
+  type: NodePort
+  ports:
+  - nodePort: 31111
+    port: 80
+    targetPort: 80
+
+
+*******************************************************************
+
+2. Create and Display Deployment and NodePort
+
+
+
+kubectl create –f nginx-deploy.yaml
+
+kubectl create -f nginx-svc.yaml
+
+kubectl get service -l app=nginx-app
+
+kubectl get po -o wide
+
+kubectl describe svc my-service
+
+
+
+*******************************************************************
+
+3. Testing
+
+
+
+# To get inside the pod
+
+kubectl exec [POD-IP] -it /bin/sh
+
+
+
+# Create test HTML page
+
+cat <<EOF > /usr/share/nginx/html/test.html
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title>Testing..</title>
+
+</head>
+
+<body>
+
+<h1 style="color:rgb(90,70,250);">Hello, NodePort Service...!</h1>
+
+<h2>Congratulations, you passed :-) </h2>
+
+</body>
+
+</html>
+
+EOF
+
+exit
+
+
+
+Test using Pod IP:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+
+kubectl get po -o wide
+
+curl http://[POD-IP]/test.html
+
+NodePort  –  Accessing using Service IP
+
+
+
+Test using Service IP:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+kubectl get svc -l app=nginx-app
+
+curl http://[cluster-ip]/test.html
+
+
+
+Test using Node IP (external IP)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+http://nodep-ip:nodePort/test.html
+
+note: node-ip is the external ip address of a node.
+
+
+
+
+
+*******************************************************************
+
+4. Cleanup
+
+
+
+kubectl delete -f nginx-deploy.yaml
+
+kubectl delete -f nginx-svc.yaml
+
+kubectl get deploy
+
+kubectl get svc
+
+kubectl get pods
+
+
+
+*******************************************************************
+
+
+
+
+
+LoadBalancer
+
+
+
+# 1. YAML: Deployment & Load Balancer Service
+
+
+
+# Deployment
+# controllers/nginx-deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-app
+  template:
+    metadata:
+      labels:
+        app: nginx-app
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+
+
+------------------------------------
+
+
+# Service - LoadBalancer
+#lb.yaml
+apiVersion: v1
+kind: Service	
+metadata:
+  name: my-service
+  labels:
+    app: nginx-app
+spec:
+  selector:
+    app: nginx-app
+  type: LoadBalancer
+  ports:
+  - nodePort: 31000
+    port: 80
+    targetPort: 80
+------------------------------------------------
+
+--------------Volumes-------------------------
+Kubernetes Volumes (emptyDir,hostPath,Persistence Volume)
+By Raman
+When a Container crashes, kubelet will restart it, but the files will be lost - the Container starts with a clean state. Second, when running Containers together in a Pod it is often necessary to share files between those Containers. The Kubernetes Volume abstraction solves both of these problems.
+
+emptyDir
+An emptyDir volume is first created when a Pod is assigned to a Node, and exists as long as that Pod is running on that node. As the name says, it is initially empty. Containers in the Pod can all read and write the same files in the emptyDir volume, though that volume can be mounted at the same or different paths in each Container. When a Pod is removed from a node for any reason, the data in the emptyDir is deleted forever
+
+Lab
+
+# nginx-emptydir.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-emptydir
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+    volumeMounts:
+    - name: test-vol
+      mountPath: /test-mnt
+  volumes:
+  - name: test-vol
+    emptyDir: {}
+
+
+*******************************************************************
+
+2. Create & Display Pod with emptyDir volume
+
+
+
+kubectl create -f nginx-emptydir.yaml
+
+kubectl get po -o wide
+
+kubectl exec nginx-emptydir df /test-mnt
+
+kubectl describe pod nginx-emptydir
+
+
+
+*******************************************************************
+
+3. Cleanup
+
+
+
+kubectl delete po nginx-emptydir
+
+
+
+hostPath
+A hostPath volume mounts a file or directory from the host node's filesystem into your Pod. This is not something that most Pods will need, but it offers a powerful escape hatch for some applications.
+
+LAB
+
+# 1. HostPath YAML file
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-hostpath
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+      volumeMounts:
+      - mountPath: /test-mnt
+        name: test-vol
+  volumes:
+  - name: test-vol
+    hostPath:
+      path: /test-vol
+
+
+
+
+*******************************************************************
+
+# 2. Create and Display HostPath
+
+
+
+kubectl create -f nginx-hostpath.yaml
+
+kubectl get po
+
+kubectl exec nginx-hostpath df /test-mnt
+
+
+
+*******************************************************************
+
+3. Test: Creating "test" file underlying host dir & accessing from from pod
+
+
+
+From HOST:
+
+~~~~~~~~~~
+
+cd /test-vol
+
+echo "From Host" > from-host.txt
+
+cat from-host.txt
+
+
+
+From POD:
+
+~~~~~~~~
+
+kubectl exec nginx-hostpath cat /test-mnt/from-host.txt
+
+4. Test: Creating "test" file inside the POD & accessing from underlying host dir
+
+
+
+From POD:
+
+~~~~~~~~~
+
+kubectl exec nginx-hostpath -it -- /bin/sh
+
+cd /test-mnt
+
+echo "From Pod" > from-pod.txt
+
+cat from-pod.txt
+
+
+
+From Host:
+
+~~~~~~~~~~
+
+cd /test-vol
+
+ls
+
+cat from-pod.txt
+
+
+
+
+
+*******************************************************************
+
+5. Clean up
+
+
+
+kubectl delete po nginx-hostpath
+
+kubectl get po
+
+ls /test-vol
+
+
+
+PersistentVolume (PV)
+A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned using Storage Classes. It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes, but have a lifecycle independent of any individual Pod that uses the PV. This API object captures the details of the implementation of the storage, be that NFS, iSCSI, or a cloud-provider-specific storage system.
+
+PersistentVolumeClaim (PVC) 
+A PersistentVolumeClaim (PVC) is a request for storage by a user. It is similar to a Pod. Pods consume node resources and PVCs consume PV resources. Pods can request specific levels of resources (CPU and Memory). Claims can request specific size and access modes (e.g., they can be mounted ReadWriteOnce, ReadOnlyMany or ReadWriteMany
+
+#pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hostpath
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/kube"
+
+#create pv with below command
+kubectl create -f pv.yaml
+---------------------------------------------
